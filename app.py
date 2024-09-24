@@ -16,6 +16,24 @@ def get_domain_from_url(url):
     return 'https://{uri.netloc}'.format(uri=parsed_uri)
 
 
+def get_query_count():
+    key = 'QUERY_COUNT'
+    count = 1
+    if rds.exists(key):
+        count = int(rds.get(key))
+    return count
+
+
+def set_query_count():
+    key = 'QUERY_COUNT'
+    count = 1
+    if rds.exists(key):
+        count = int(rds.get(key))
+        count += 1
+    rds.set(key, count)
+    return count
+
+
 def get_icon_list_from_rds(key):
     if rds.exists(key):
         # print('cached')
@@ -41,8 +59,11 @@ def get_icon_list_from_rds(key):
 @app.route('/')
 def hello_world():  # put application's code here
 
-    return ('Baby Favicon Tool v1.0  \r\n<br> by:obaby \r\n <br><a href="https://oba.by" target="_blank">https://oba.by</a> <br>\r\r '
-            '<a href="https://h4ck.org.cn" target="_blank">https://h4ck.org.cn</a>')
+    return ('--------------------------- <br> '
+            'Query count:' + str(get_query_count()) + '<br>'
+                                                      '=========================== <br> '
+                                                      'Baby Favicon Tool v1.0  \r\n<br> by:obaby \r\n <br><a href="https://oba.by" target="_blank">https://oba.by</a> <br>\r\r '
+                                                      '<a href="https://h4ck.org.cn" target="_blank">https://h4ck.org.cn</a>')
 
 
 # http://127.0.0.1:5000/api/get_favicon?url=https://h4ck.org.cn
@@ -52,9 +73,10 @@ def search():
     if '.' not in query:
         return 'invalid url'
     if not query.startswith('http'):
-        query = 'https://' + query
+        query = 'http://' + query
 
     icons = get_icon_list_from_rds(query)
+    set_query_count()
     # icons_str = json.dumps(icons)
     return jsonify(icons)
 
@@ -65,10 +87,13 @@ def redirect_icon():
     if '.' not in query:
         return 'invalid url'
     if not query.startswith('http'):
-        query = 'https://' + query
-
+        query = 'http://' + query
+    set_query_count()
     icons = get_icon_list_from_rds(query)
-    icon_url = icons[0]['url']
+    try:
+        icon_url = icons[0]['url']
+    except:
+        icon_url = 'https://h4ck.org.cn/wp-content/uploads/2024/09/favicon.png'
     return redirect(icon_url, code=302)
 
 
