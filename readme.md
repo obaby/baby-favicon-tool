@@ -51,3 +51,10 @@ http://127.0.0.1:5000/api/get_favicon?url=oba.by
 http://127.0.0.1:5000/api/redirect_favicon?url=oba.by  
 返回数据内容为上述接口的第一个结果，例如上面的 域名将会直接 302跳转到 https://oba.by/wp-content/uploads/2020/09/icon-500-300x300.png  
 如果没有 favicon 将会返回默认连接：https://h4ck.org.cn/wp-content/uploads/2024/09/favicon.png  
+
+安装：  
+```shell
+1. pip install -r requirement.pip
+2. apt install redis-server 
+```   
+服务依赖 redis，请在启动之前安装 redis 服务   
